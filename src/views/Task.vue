@@ -46,8 +46,19 @@ export default {
       });
   },
   methods: {
-    deleteTask(taskId) {
+    async deleteTask(taskId) {
+      const token = localStorage.getItem("token");
       console.log(taskId);
+      const url = `https://task-list-tif.herokuapp.com/api/v1/task/${taskId}`;
+      const response = await fetch(url, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      });
+      const result = await response.json();
+      console.log(result);
     },
   },
 };
