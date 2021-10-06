@@ -1,7 +1,7 @@
 <template>
   <div class="container">
-    <div class="row mt-5">
-      <div v-for="task in tasks" :key="task.id" class="col-lg-6 mt-4">
+    <div class="row mt-5 mb-5">
+      <div v-for="task in tasks" :key="task._id" class="col-lg-6 mt-4">
         <div class="card p-2">
           <h4>{{ task.title }}</h4>
           <p class="subject">{{ task.subject }}</p>
@@ -9,8 +9,15 @@
           <p>
             {{ task.description }}
           </p>
-
-          <a :href="task.url" class="badge rounded-pill bg-warning">link</a>
+          <div class="action">
+            <a :href="task.url" class="badge rounded-pill bg-warning">link</a>
+            <button
+              @click="deleteTask(task._id)"
+              class="ml-2 badge rounded-pill bg-danger btn-action"
+            >
+              Hapus
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -35,10 +42,13 @@ export default {
         return response.json();
       })
       .then((result) => {
-        console.log(result);
         this.tasks = result.data;
-        console.log(this.tasks);
       });
+  },
+  methods: {
+    deleteTask(taskId) {
+      console.log(taskId);
+    },
   },
 };
 </script>
@@ -76,8 +86,19 @@ a {
   width: 20%;
 }
 
+.btn-action {
+  display: inline-block;
+  width: 20%;
+  border: none;
+}
+
+.action {
+  display: flex;
+  justify-content: space-between;
+}
+
 .fab {
-  position: absolute;
+  position: fixed;
   right: 30px;
   cursor: pointer;
   bottom: 30px;
