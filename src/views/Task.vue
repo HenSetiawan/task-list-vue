@@ -12,6 +12,7 @@
           <div class="action">
             <a :href="task.url" class="badge rounded-pill bg-warning">link</a>
             <button
+              v-if="isAdmin"
               @click="deleteTask(task._id)"
               class="ml-2 badge rounded-pill bg-danger btn-action"
             >
@@ -31,8 +32,13 @@
         />
       </div>
     </div>
-    <Modal />
-    <div class="fab" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    <Modal v-if="isAdmin" />
+    <div
+      v-if="isAdmin"
+      class="fab"
+      data-bs-toggle="modal"
+      data-bs-target="#exampleModal"
+    >
       +
     </div>
   </div>
@@ -40,36 +46,57 @@
 
 <script>
 import Modal from "./Modal.vue";
+import swal from "sweetalert";
+
 export default {
   name: "Task",
   data() {
-    return { tasks: null, isLoading: true };
+    return { tasks: null, isLoading: true, isAdmin: false };
   },
   components: { Modal },
   created() {
-    fetch("https://task-list-tif.herokuapp.com/api/v1/tasks")
-      .then((response) => {
-        return response.json();
-      })
-      .then((result) => {
-        this.isLoading = false;
-        this.tasks = result.data;
-      });
+    this.getTask();
   },
   methods: {
     async deleteTask(taskId) {
-      const token = localStorage.getItem("token");
-      console.log(taskId);
-      const url = `https://task-list-tif.herokuapp.com/api/v1/task/${taskId}`;
-      const response = await fetch(url, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token,
-        },
+      const willDelete = await swal({
+        title: "Yakin Nih?",
+        text: "Data yang dihapus tidak bisa lagi dikembalikan!",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
       });
-      const result = await response.json();
-      console.log(result);
+
+      if (willDelete) {
+        const token = localStorage.getItem("token");
+        const url = `https://task-list-tif.herokuapp.com/api/v1/task/${taskId}`;
+        await fetch(url, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+        });
+        this.getTask();
+        swal("Yeay data berhasil dihapus!", {
+          icon: "success",
+        });
+      }
+    },
+    getTask() {
+      fetch("https://task-list-tif.herokuapp.com/api/v1/tasks")
+        .then((response) => {
+          return response.json();
+        })
+        .then((result) => {
+          this.isLoading = false;
+          this.tasks = result.data;
+        });
+
+      const token = localStorage.getItem("token");
+      if (token !== undefined && token !== null) {
+        this.isAdmin = true;
+      }
     },
   },
 };

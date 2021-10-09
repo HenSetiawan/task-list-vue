@@ -4,6 +4,7 @@ import "./registerServiceWorker";
 import router from "./router";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap";
-import VModal from "vue-js-modal";
+import VueSweetalert2 from "vue-sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
 
-createApp(App).use(router, VModal).mount("#app");
+createApp(App).use(router, VueSweetalert2).mount("#app");
