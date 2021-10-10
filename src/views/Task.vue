@@ -32,7 +32,7 @@
         />
       </div>
     </div>
-    <Modal v-if="isAdmin" />
+    <Modal v-if="isAdmin" @sendNewData="getTask()" />
     <div
       v-if="isAdmin"
       class="fab"
@@ -56,6 +56,10 @@ export default {
   components: { Modal },
   created() {
     this.getTask();
+    const token = localStorage.getItem("token");
+    if (token !== undefined && token !== null) {
+      this.isAdmin = true;
+    }
   },
   methods: {
     async deleteTask(taskId) {
@@ -92,11 +96,6 @@ export default {
           this.isLoading = false;
           this.tasks = result.data;
         });
-
-      const token = localStorage.getItem("token");
-      if (token !== undefined && token !== null) {
-        this.isAdmin = true;
-      }
     },
   },
 };

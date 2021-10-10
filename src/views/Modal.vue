@@ -28,6 +28,7 @@
                   aria-label="task"
                   aria-describedby="basic-addon1"
                   id="title"
+                  v-model="title"
                 />
               </div>
             </div>
@@ -40,6 +41,7 @@
                   aria-label="subject"
                   aria-describedby="basic-addon1"
                   id="subject"
+                  v-model="subject"
                 />
               </div>
             </div>
@@ -50,6 +52,7 @@
                   class="form-control"
                   id="description"
                   rows="3"
+                  v-model="description"
                 ></textarea>
               </div>
             </div>
@@ -57,23 +60,12 @@
               <p class="form-label">Batas Akhir</p>
               <div class="input-group mb-3">
                 <input
-                  type="date"
+                  type="datetime-local"
                   class="form-control"
                   aria-label="deadline"
                   aria-describedby="basic-addon1"
                   id="deadline-date"
-                />
-              </div>
-            </div>
-            <div class="input">
-              <p class="form-label">Batas Akhir</p>
-              <div class="input-group mb-3">
-                <input
-                  type="time"
-                  class="form-control"
-                  aria-label="deadline"
-                  aria-describedby="basic-addon1"
-                  id="deadline-time"
+                  v-model="deadlineDate"
                 />
               </div>
             </div>
@@ -86,6 +78,7 @@
                   aria-label="link"
                   aria-describedby="basic-addon1"
                   id="url"
+                  v-model="url"
                 />
               </div>
             </div>
@@ -98,7 +91,11 @@
             >
               Close
             </button>
-            <button type="button" class="btn btn-warning btn-sm text-light">
+            <button
+              @click="sendNewTask()"
+              type="button"
+              class="btn btn-warning btn-sm text-light"
+            >
               Save Task
             </button>
           </div>
@@ -111,6 +108,46 @@
 <script>
 export default {
   name: "Modal",
+  data() {
+    return {
+      title: "",
+      subject: "",
+      description: "",
+      deadlineDate: "",
+      url: "",
+    };
+  },
+  methods: {
+    async sendNewTask() {
+      const token = localStorage.getItem("token");
+      const data = {
+        title: this.title,
+        description: this.description,
+        subject: this.subject,
+        deadline: this.deadlineDate,
+        url: this.url,
+      };
+      try {
+        const response = await fetch(
+          "https://task-list-tif.herokuapp.com/api/v1/task/",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token,
+            },
+            body: JSON.stringify(data),
+          }
+        );
+
+        const result = await response.json();
+        console.log(result);
+        this.$emit("sendNewData");
+      } catch (error) {
+        console.log(error);
+      }
+    },
+  },
 };
 </script>
 

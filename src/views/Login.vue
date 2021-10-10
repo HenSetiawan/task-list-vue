@@ -38,6 +38,12 @@ export default {
       password: "",
     };
   },
+  created() {
+    const token = localStorage.getItem("token");
+    if (token !== undefined && token !== null) {
+      this.$router.push("/");
+    }
+  },
   methods: {
     async login() {
       const response = await fetch(
@@ -56,6 +62,7 @@ export default {
       const result = await response.json();
       if (result.token) {
         localStorage.setItem("token", result.token);
+        this.$router.push("/");
       }
     },
   },
