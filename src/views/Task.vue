@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="row mt-5 mb-5">
+    <div class="row mt-5 mb-5" v-if="!isLoading">
       <div v-for="task in tasks" :key="task._id" class="col-lg-6 mt-4">
         <div class="card p-2">
           <h4>{{ task.title }}</h4>
@@ -12,6 +12,7 @@
           <div class="action">
             <a :href="task.url" class="badge rounded-pill bg-warning">link</a>
             <button
+              v-if="isAdmin"
               @click="deleteTask(task._id)"
               class="ml-2 badge rounded-pill bg-danger btn-action"
             >
@@ -21,8 +22,23 @@
         </div>
       </div>
     </div>
-    <Modal />
-    <div class="fab" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    <div class="row">
+      <div class="col-lg-12">
+        <img
+          v-if="isLoading"
+          src="../assets/loader.svg"
+          alt="loading"
+          class="img-fluid mx-auto mt-5"
+        />
+      </div>
+    </div>
+    <Modal v-if="isAdmin" @sendNewData="getTask()" />
+    <div
+      v-if="isAdmin"
+      class="fab"
+      data-bs-toggle="modal"
+      data-bs-target="#exampleModal"
+    >
       +
     </div>
   </div>
@@ -30,24 +46,61 @@
 
 <script>
 import Modal from "./Modal.vue";
+import swal from "sweetalert";
+
 export default {
   name: "Task",
   data() {
-    return { tasks: null };
+    return {
+      tasks: null,
+      isLoading: true,
+      isAdmin: false,
+      baseUrl: process.env.VUE_APP_BASE_URL,
+    };
   },
   components: { Modal },
   created() {
-    fetch("https://task-list-tif.herokuapp.com/api/v1/tasks")
-      .then((response) => {
-        return response.json();
-      })
-      .then((result) => {
-        this.tasks = result.data;
-      });
+    this.getTask();
+    const token = localStorage.getItem("token");
+    if (token !== undefined && token !== null) {
+      this.isAdmin = true;
+    }
   },
   methods: {
-    deleteTask(taskId) {
-      console.log(taskId);
+    async deleteTask(taskId) {
+      const willDelete = await swal({
+        title: "Yakin Nih?",
+        text: "Data yang dihapus tidak bisa lagi dikembalikan!",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+      });
+
+      if (willDelete) {
+        const token = localStorage.getItem("token");
+        const url = `${this.baseUrl}/task/${taskId}`;
+        await fetch(url, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+        });
+        this.getTask();
+        swal("Yeay data berhasil dihapus!", {
+          icon: "success",
+        });
+      }
+    },
+    getTask() {
+      fetch(`${this.baseUrl}/tasks`)
+        .then((response) => {
+          return response.json();
+        })
+        .then((result) => {
+          this.isLoading = false;
+          this.tasks = result.data;
+        });
     },
   },
 };
