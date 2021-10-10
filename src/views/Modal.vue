@@ -29,6 +29,7 @@
                   aria-describedby="basic-addon1"
                   id="title"
                   v-model="title"
+                  required
                 />
               </div>
             </div>
@@ -42,6 +43,7 @@
                   aria-describedby="basic-addon1"
                   id="subject"
                   v-model="subject"
+                  required
                 />
               </div>
             </div>
@@ -53,6 +55,7 @@
                   id="description"
                   rows="3"
                   v-model="description"
+                  required
                 ></textarea>
               </div>
             </div>
@@ -66,6 +69,7 @@
                   aria-describedby="basic-addon1"
                   id="deadline-date"
                   v-model="deadlineDate"
+                  required
                 />
               </div>
             </div>
@@ -115,6 +119,7 @@ export default {
       description: "",
       deadlineDate: "",
       url: "",
+      baseUrl: process.env.VUE_APP_BASE_URL,
     };
   },
   methods: {
@@ -128,17 +133,14 @@ export default {
         url: this.url,
       };
       try {
-        const response = await fetch(
-          "https://task-list-tif.herokuapp.com/api/v1/task/",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: token,
-            },
-            body: JSON.stringify(data),
-          }
-        );
+        const response = await fetch(`${this.baseUrl}/task/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+          body: JSON.stringify(data),
+        });
 
         const result = await response.json();
         console.log(result);

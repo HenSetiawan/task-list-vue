@@ -51,7 +51,12 @@ import swal from "sweetalert";
 export default {
   name: "Task",
   data() {
-    return { tasks: null, isLoading: true, isAdmin: false };
+    return {
+      tasks: null,
+      isLoading: true,
+      isAdmin: false,
+      baseUrl: process.env.VUE_APP_BASE_URL,
+    };
   },
   components: { Modal },
   created() {
@@ -73,7 +78,7 @@ export default {
 
       if (willDelete) {
         const token = localStorage.getItem("token");
-        const url = `https://task-list-tif.herokuapp.com/api/v1/task/${taskId}`;
+        const url = `${this.baseUrl}/task/${taskId}`;
         await fetch(url, {
           method: "DELETE",
           headers: {
@@ -88,7 +93,7 @@ export default {
       }
     },
     getTask() {
-      fetch("https://task-list-tif.herokuapp.com/api/v1/tasks")
+      fetch(`${this.baseUrl}/tasks`)
         .then((response) => {
           return response.json();
         })
