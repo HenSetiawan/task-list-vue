@@ -10,7 +10,12 @@
             {{ task.description }}
           </p>
           <div class="action">
-            <a :href="task.url" class="badge rounded-pill bg-warning">link</a>
+            <a
+              :href="task.url"
+              class="badge rounded-pill bg-warning"
+              target="_blank"
+              >link</a
+            >
             <button
               v-if="isAdmin"
               @click="deleteTask(task._id)"
